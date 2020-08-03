@@ -1,0 +1,15 @@
+#Setting the version of docker compose that we'll be using.
+version: '3'
+
+# In the docker world, 'service' essentially equates to a container type
+services: 
+    redis-server:
+        image: redis
+    
+    # build = look in the directory '.' for a dockerfile to build from.
+    node-app:
+        build: .
+        # - in a yml file is how we denote an array!
+        # Remember port syntax: external port : container port
+        ports:
+            - "4001:8081"
