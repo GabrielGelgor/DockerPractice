@@ -1,0 +1,16 @@
+# Specify a base image. If you want a specific version, mention it in the TAG, ex: "node:6.14"
+FROM node:alpine
+
+#Setting a working directory to make sure that we don't overwrite any default folders/files
+WORKDIR /usr/app
+
+# Install some dependencies
+# COPY <where the file is in relation to build context> <Where it will be stored on the container>
+COPY ./package.json ./ 
+RUN npm install 
+
+#Splitting our dependency copy off so that we don't have to reinstall ALL of them just because we changed an unrelated line of code.
+COPY ./ ./
+
+# Default command
+CMD ["npm", "start"]

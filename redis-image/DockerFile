@@ -1,0 +1,11 @@
+# Use an existing docker image as a base (This is what FROM does!)
+# This is like installing an OS on a blank computer. 
+FROM alpine 
+
+# The reason we can use the APK command here is because it comes packaged with alpine!
+# Download and install a dependency (RUN is used to execute a custom command while prepping our image)
+RUN apk add --update redis
+RUN apk add --update gcc
+
+# Tell the image what to do when it starts as a container
+CMD ["redis-server"]
