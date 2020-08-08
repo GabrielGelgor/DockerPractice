@@ -1,0 +1,34 @@
+#Lets travis know that it needs to use superuser permissions for the following steps.
+sudo: required
+language: generic
+
+# Tells travis that we need a copy of docker ready to go.
+services:
+    - docker
+
+# Setup that we need to do before we start
+before_install:
+    - docker build -t gabrielgelgor/docker-react-practice -f Dockerfile.dev .
+
+script:
+    - docker run -e CI=true gabrielgelgor/docker-react-practice npm run test
+
+deploy:
+    provider: elasticbeanstalk
+    region: "us-east-2"
+    app: "docker-react-practice"
+    env: "DockerReactPractice-env"
+
+    #Storage holding our app's info
+    bucket_name: "elasticbeanstalk-us-east-2-453736399261"
+
+    #Folder within the bucket
+    bucket_path: "docker-react-practice"
+
+    #Only deploy when the master branch has been updated
+    on:
+        branch: master
+
+    #Access keys
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY

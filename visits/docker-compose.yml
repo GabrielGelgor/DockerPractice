@@ -8,6 +8,9 @@ services:
     
     # build = look in the directory '.' for a dockerfile to build from.
     node-app:
+        #restart policy on crash
+        restart: on-failure
+
         build: .
         # - in a yml file is how we denote an array!
         # Remember port syntax: external port : container port
