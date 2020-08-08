@@ -1,5 +1,6 @@
 ## Lessons
 
+- Making use of multiple dockerfiles to set up testing environments.
 - Setting up CI w/ Travis
 - Creating travis config files
 - Navigating the Travis dashboard, how to debug failed builds.
