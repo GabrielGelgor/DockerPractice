@@ -1,0 +1,39 @@
+sudo: required
+language: generic
+services:
+    - docker
+
+# We have to reach into the CLIENT directory to run our tests for the front end.
+# We therefore state at the end of the line that ./client is the BUILD CONTEXT, where the dockerfile can be found.
+before_install:
+    - docker build -t gabrielgelgor/react-test -f ./client/Dockerfile.dev ./client
+
+# The CI environment variable prevents test watch from starting up.
+script:
+    - docker run -e CI=true gabrielgelgor/react-test npm test
+
+after_success:
+    - docker build -t gabrielgelgor/multi-client ./client
+    - docker build -t gabrielgelgor/multi-nginx ./nginx
+    - docker build -t gabrielgelgor/multi-server ./server
+    - docker build -t gabrielgelgor/multi-worker ./worker
+    # Log in to the docker CLI by piping the env variable DOCKER PASSWORD to the login command.
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    # Take these images and publish them to docker hub
+    - docker push gabrielgelgor/multi-client
+    - docker push gabrielgelgor/multi-nginx
+    - docker push gabrielgelgor/multi-server
+    - docker push gabrielgelgor/multi-worker
+
+deploy:
+    provider: elasticbeanstalk
+    region: us-east-2
+    app: multi-docker
+    env: MultiDocker-env-1
+    bucket_name: elasticbeanstalk-us-east-2-453736399261
+    bucket_path: docker-multi
+    on:
+        branch: master
+    
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY

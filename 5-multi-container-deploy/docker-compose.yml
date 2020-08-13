@@ -1,0 +1,76 @@
+version: '3'
+services:
+    #Setting up our postgres service
+    postgres:
+        image: 'postgres:latest'
+        environment:
+            - POSTGRES_PASSWORD=postgres_password
+
+    redis:
+        image: 'redis:latest'
+
+    api:
+        build:
+            #Name of the dockerfile to use
+            dockerfile: Dockerfile.dev
+            #The folder to look in
+            context: ./server
+        volumes:
+            - /app/node_modules
+            #Whevenever you look into the server directory (except for what's mentioned above), copy it into app!
+            - ./server:/app
+        environment: 
+            - CHOKIDAR_USEPOLLING=true
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - PGUSER=postgres
+            - PGHOST=postgres
+            - PGDATABASE=postgres
+            - PGPASSWORD=postgres_password
+            - PGPORT=5432
+        stdin_open: true
+        depends_on: 
+            - postgres
+
+    client:
+        # What/where the dockerfile is
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./client
+
+        volumes:
+            - app/node_modules
+            - ./client:/app
+
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+        stdin_open: true
+    
+    worker:
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./worker
+
+        volumes:
+            - app/node_modules
+            - ./worker:/app
+        
+        environment: 
+            - CHOKIDAR_USEPOLLING=true
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+        stdin_open: true
+
+    nginx:
+        # Our router should ALWAYS be running, no matter what. It's vital to access the site.
+        restart: always
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./nginx
+        # Our nginx server is the only exposed service... It routes to our services!
+        ports:
+            - '3050:80'
+
+        depends_on: 
+            - client
+            - api
