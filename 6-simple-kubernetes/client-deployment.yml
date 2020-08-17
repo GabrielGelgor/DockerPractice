@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment    # What we actually use in dev/prod instead of pods. Think of this as a 'pod manager' that can automatically make the changes that would normally take a few steps on our end
+metadata:
+    name: client-deployment
+spec:
+    replicas: 1 # Number of pod copies to make. Create x pods each using the template below.
+    selector:                  # This selector allows the deployment to reach out and grab the created pods that it's managing. 
+        matchLabels:
+            component: web
+    template:                  # The template for every pod to be created and maintained by this deployment.
+        metadata:
+            labels:
+                component: web
+        spec:
+            containers: 
+                - 
+                    name: client
+                    image: gabrielgelgor/multi-client
+                    ports:
+                        - containerPort: 3000

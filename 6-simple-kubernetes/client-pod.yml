@@ -1,0 +1,13 @@
+apiVersion: v1 # Determines what type of objects you're allowed to create in this file.
+kind: Pod # The type of config file. Pods are meant to group containers of a very similar purpose. These containers are VERY TIGHTLY COUPLED, not just 'kinda related'.
+metadata:
+    name: client-pod
+    labels: 
+        component: web # This key-value pair is completely arbitrary, just used to identify this object in other config files.
+spec:
+    containers:
+        - 
+            name: client
+            image: gabrielgelgor/multi-worker
+            ports:
+                - containerPort: 3000
