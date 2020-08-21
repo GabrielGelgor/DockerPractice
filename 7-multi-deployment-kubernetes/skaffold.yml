@@ -1,0 +1,20 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:  # Two modes in skaffold, MODE 1 rebuilds images whenever you make a change, MODE 2 injects changed files into your currently running pods. 2 is good if you have nodemon set up.
+    local:
+        push: false # Should skaffold push the current changes to docker hub?
+    artifacts: # images we want skaffold to manage
+        - 
+            image: gabrielgelgor/multi-client 
+            context: client
+            docker:
+                dockerfile: Dockerfile.dev
+            sync:   # What files to keep an eye on. Enables MODE 2.
+                '**/*.js': .
+                '**/*.css': .
+                '**/*.html': .
+
+deploy:
+    kubectl:
+        manifests:
+            - k8s/client-deployment.yml
